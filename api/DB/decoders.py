@@ -1,0 +1,21 @@
+from typing import Optional
+from sqlalchemy.types import TypeDecorator, DateTime
+from datetime import datetime, timezone
+
+class UnixTimestampMs(TypeDecorator):
+    """
+    Stores data as TIMESTAMP WITH TIME ZONE in the DB (impl=DateTime),
+    converts millisecond Unix timestamps from Python to datetime objects.
+    """
+    impl = DateTime(timezone=True)  # The SQL type the database sees
+
+    def process_bind_param(self, value: Optional[int], dialect) -> Optional[datetime]:
+        if value is not None:
+            # Convert ms to seconds (float)
+            timestamp_sec = value / 1000.0
+            # Create a UTC datetime object from the timestamp
+            return datetime.fromtimestamp(timestamp_sec, tz=timezone.utc)
+        return value
+
+    def process_result_value(self, value: Optional[datetime], dialect) -> Optional[datetime]:
+        return value

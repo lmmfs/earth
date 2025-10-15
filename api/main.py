@@ -1,7 +1,6 @@
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
-from db import engine, Base
-import model
+from DB import engine, Base, model
 
 app = FastAPI()
 
@@ -10,8 +9,8 @@ async def lifespan(app: FastAPI):
     # Startup
     Base.metadata.create_all(bind=engine)
     print('Hello')
-    #from data_loader import fetch_earthquake_data
-    #fetch_earthquake_data()
+    from data_loader import fetch_earthquake_data
+    fetch_earthquake_data()
     yield
     # Shutdown
     
