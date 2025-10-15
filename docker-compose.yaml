@@ -1,0 +1,24 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:16
+    container_name: earthquake_db
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: earthquakes
+    volumes:
+      - ./data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  api:
+    build: ./api
+    container_name: earthquake_api
+    environment:
+      DATABASE_URL: postgres://user:password@db:5432/earthquakes
+    depends_on:
+      - db
+    ports:
+      - "8000:8000"
