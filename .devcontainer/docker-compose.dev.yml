@@ -1,0 +1,11 @@
+version: '3.8'
+services:
+  api:
+    # Set the context to the project root (the directory containing .devcontainer)
+    build:
+      context: .
+      # The dockerfile path is relative to the context (the project root)
+      dockerfile: .devcontainer/Dockerfile.dev 
+    volumes:
+      # Map the local code to the container's app directory
+      - ./api:/app 

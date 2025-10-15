@@ -1,14 +1,16 @@
 {
-  "name": "Earthquake Backend Dev",
-  "dockerFile": "Dockerfile",
-  "context": "..",
-  "workspaceFolder": "/workspace",
-  "mounts": [
-    "source=${localWorkspaceFolder},target=/workspace,type=bind"
-  ],
-  "service": "dev",
-  "runServices": ["db"],
-  "dockerComposeFile": "../docker-compose.yml",
+  "name": "Earth Backend Dev",
+  "dockerComposeFile": [
+    "../docker-compose.yaml",
+    "docker-compose.dev.yml"
+  ], 
+  "service": "api", 
+  "runServices": ["db", "api"], 
+  "workspaceFolder": "/app", 
+  "remoteUser": "vscode",
+  "overrideCommand": true,
+  "forwardPorts": [8000, 5432],
+
   "customizations": {
     "vscode": {
       "extensions": [
@@ -17,8 +19,5 @@
         "ms-azuretools.vscode-docker"
       ]
     }
-  },
-  "forwardPorts": [8000],
-  "postCreateCommand": "pip install -r /workspace/api/requirements.txt",
-  "remoteUser": "vscode"
+  }
 }

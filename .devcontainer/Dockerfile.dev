@@ -1,0 +1,19 @@
+FROM python:3.12-slim
+
+RUN apt-get update && apt-get install -y \
+    postgresql-client \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+COPY api/requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+COPY api/ /app
+
+ARG USER_UID=1000
+RUN groupadd --gid $USER_UID vscode \
+    && useradd --uid $USER_UID --gid vscode --shell /bin/bash --create-home vscode 
+    
+RUN chown -R vscode:vscode /app
+
+USER vscode

@@ -13,12 +13,20 @@ services:
     ports:
       - "5432:5432"
 
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user -d earthquakes"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
   api:
     build: ./api
     container_name: earthquake_api
     environment:
       DATABASE_URL: postgres://user:password@db:5432/earthquakes
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     ports:
       - "8000:8000"
