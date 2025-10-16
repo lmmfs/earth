@@ -29,9 +29,19 @@ start the services
   GET /earthquakes
 ```
 
+| Parameter | Type | Default | Description |
+| :-------- | :--- | :------ | :---------- |
+| `offset` | `int` | `0` | The number of records to skip (for pagination). |
+| `limit` | `int` | `10` | The maximum number of records to return per page. |
+| `min_magnitude` | `float` | `0.0` | Minimum magnitude (inclusive, e.g., magnitude >= min_magnitude). |
+| `max_magnitude` | `float` | `20.0` | Maximum magnitude (inclusive, e.g., magnitude <= max_magnitud). |
+| `after` | `datetime` | (None) | Filter for records occurring on or after this date/time (ISO 8601 format). |
+| `before` | `datetime` | (None) | Filter for records occurring on or before this date/time (ISO 8601 format). |
+
 |HTTP Status Code	| Description           |
 | :---------------- | :-------------------- |
-|200 OK	            |Successfully returned the most recent earthquake data.|
+|200 OK	            | Successfully returned the most recent earthquake records.|
+|404 Not Found	    | No earthquake record exists with the provided ID.|
 
 
 #### Get earthquake record
@@ -46,11 +56,11 @@ start the services
 
 |HTTP Status Code	| Description           |
 | :---------------- | :-------------------- |
-|200 OK	            |Successfully returned the specific earthquake record.|
-|404 Not Found	    |No earthquake record exists with the provided ID.|
+|200 OK	            | Successfully returned the specific earthquake record.|
+|404 Not Found	    | No earthquake record exists with the provided ID.|
 
 
-## Design decisons
+## Brief notes on design decisions
 
 ### Database schema
 For the database schema I add these colums

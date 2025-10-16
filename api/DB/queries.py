@@ -9,27 +9,62 @@ from .schemas import EarthquakeResponse
 
 logger = get_logger(__name__) 
 
-# Select from Earthquake table all ids
-# returns as a set of strings
-def get_all_existing_ids(db: Session) -> set[str]:
+def select_ids(db: Session) -> set[str]:
+    """
+    Select the ids of records on table
+
+    Select all the ids of the earthquake records from earthquake table
+
+    :param db: Session for the database connection.
+    :type db: Session
+    :returns: set with all the record ids.
+    :rtype: set[str]
+    """
     stmt = select(Earthquake.id)
     
     result = db.execute(stmt).scalars().all()
 
     return set(result)
 
-# Insert into Earthquake table a new earthquake id
-def add_new_record(db: Session, record_data: dict):
+def insert_new_record(db: Session, record_data: dict):
+    """
+    Insert a new record on table
+
+    Insert into earthquake table a new a record, with data from a dictionary
+    
+    :param db: Session for the database connection.
+    :type db: Session
+    :param record_data: Dictionary with the record data.
+    :type record_data: dict
+    """
     new_record = Earthquake(**record_data)
     
     db.add(new_record)
 
 
 def get_base_select_statement():
+    """
+    Get a basic select statement to the earthquake table
+    
+    SELECT * FROM earthquakes 
+
+    :returns: Select statement.
+    :rtype: Select[Tuple[Earthquake]]
+    """
     return select(Earthquake)
 
 
 def execute_select(db: Session, statement:Select[Tuple[Earthquake]])-> List[EarthquakeResponse]:
+    """
+    Executes a select statement on the earthquake table
+
+    :param db: Session for the database connection.
+    :type db: Session
+    :param statement: The select statement.
+    :type statement: Select[Tuple[Earthquake]]
+    :returns: The result of the select.
+    :rtype: List[EarthquakeResponse]
+    """
     results = db.execute(statement).scalars().all()
 
     response_list = [
@@ -42,29 +77,20 @@ def execute_select(db: Session, statement:Select[Tuple[Earthquake]])-> List[Eart
     return response_list
 
 
-# Select from Earthquake most recent n earthquakes
-# limit: int
-# returns as a set of strings
-def select_last_n_recent_earthquakes(db: Session, limit: int) -> List[EarthquakeResponse]:
-    query_limit = max(limit, 1)
-
-    logger.info(f"Attempt to retrieve {query_limit} records.")
-        
-    stmt = select(Earthquake).order_by(Earthquake.time.desc()).limit(query_limit)
-
-    results = db.execute(stmt).scalars().all()
-
-    response_list = [
-        EarthquakeResponse.model_validate(record) 
-        for record in results
-    ]
-
-    logger.info(f"Successfully retrieved {len(response_list)} records.")
-    
-    return response_list
-
-
 def select_earthquake_with_id(db: Session, id: str) -> List[EarthquakeResponse]:
+    """
+    Select specific earthquake record
+
+    Select earthquake record from the earthquake table,
+    given a specific id
+
+    :param db: Session for the database connection.
+    :type db: Session
+    :param id: The id os the earthquake record.
+    :type id: str
+    :returns: The result of the select.
+    :rtype: List[EarthquakeResponse]
+    """
     logger.info(f"Attempt to retrieve record with id {id}")
 
     stmt = select(Earthquake).where(Earthquake.id == id)
