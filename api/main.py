@@ -1,6 +1,9 @@
 from contextlib import asynccontextmanager
+from datetime import datetime
+from typing import Optional
 from fastapi import FastAPI, HTTPException
 from DB import engine, Base, model
+from constants import MAX_MAGNITUDE, MIN_MAGNITUDE
 from data_requester import retrieve_recent_earthquakes, retrieve_specific_earthquake
 from logger import get_logger
 
@@ -28,8 +31,26 @@ def read_root():
 
 
 @app.get("/earthquakes")
-def get_recent_earthquakes():
-    return retrieve_recent_earthquakes()
+def get_recent_earthquakes(
+    offset: int = 0, 
+    limit: int = 10, 
+    min_magnitude: float = MIN_MAGNITUDE,
+    max_magnitude: float = MAX_MAGNITUDE,
+    after: Optional[datetime] = None,
+    before: Optional[datetime] = None,
+    ):
+    if max_magnitude < min_magnitude:
+        raise HTTPException(status_code=404, detail="records not found")
+
+    if after and before and before < after:
+        raise HTTPException(status_code=404, detail="records not found")
+    
+    records, found = retrieve_recent_earthquakes(offset, limit, min_magnitude, max_magnitude, after, before)
+    
+    if not found:
+        raise HTTPException(status_code=404, detail="records not found")
+
+    return records
 
 
 @app.get("/earthquakes/{earthquake_id}")

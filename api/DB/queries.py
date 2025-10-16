@@ -1,5 +1,5 @@
-from typing import List
-from sqlalchemy import select
+from typing import List, Tuple
+from sqlalchemy import Select, select
 from sqlalchemy.orm import Session
 
 from logger import get_logger
@@ -23,6 +23,23 @@ def add_new_record(db: Session, record_data: dict):
     new_record = Earthquake(**record_data)
     
     db.add(new_record)
+
+
+def get_base_select_statement():
+    return select(Earthquake)
+
+
+def execute_select(db: Session, statement:Select[Tuple[Earthquake]])-> List[EarthquakeResponse]:
+    results = db.execute(statement).scalars().all()
+
+    response_list = [
+        EarthquakeResponse.model_validate(record) 
+        for record in results
+    ]
+
+    logger.info(f"Successfully retrieved {len(response_list)} records.")
+    
+    return response_list
 
 
 # Select from Earthquake most recent n earthquakes
