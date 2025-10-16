@@ -6,7 +6,7 @@ from fastapi import FastAPI, HTTPException
 from constants import MAX_MAGNITUDE, MIN_MAGNITUDE, REFRESH_DATASET_INTERVAL_SECONDS
 from DB import engine, Base, model
 from data_requester import retrieve_recent_earthquakes, retrieve_specific_earthquake
-from data_loader import fetch_earthquake_data
+from data_loader import fetch_earthquake_data_opt
 from logger import get_logger, setup_logging
 
 app = FastAPI()
@@ -22,7 +22,7 @@ async def lifespan(app: FastAPI):
     Base.metadata.create_all(bind=engine)
     # Request USGS data on 10 second interval
     scheduler.add_job(
-        func=fetch_earthquake_data, 
+        func=fetch_earthquake_data_opt, 
         trigger='interval', 
         seconds=REFRESH_DATASET_INTERVAL_SECONDS, 
         id='earthquake_fetcher',

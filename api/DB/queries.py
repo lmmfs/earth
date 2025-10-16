@@ -11,7 +11,7 @@ logger = get_logger(__name__)
 
 def select_ids(db: Session) -> set[str]:
     """
-    Select the ids of records on table
+    Select all the record ids of on table
 
     Select all the ids of the earthquake records from earthquake table
 
@@ -24,6 +24,24 @@ def select_ids(db: Session) -> set[str]:
     
     result = db.execute(stmt).scalars().all()
 
+    return set(result)
+
+def select_existing_ids(db: Session, ids_to_check: list[str]) -> set[str]:
+    """
+    Select the record ids of a list present on table 
+
+    Select all the ids of the earthquake records from a list that 
+    are present on earthquake table
+
+    :param db: Session for the database connection.
+    :type db: Session
+    :returns: set with all the record ids.
+    :rtype: set[str]
+    """
+    stmt = select(Earthquake.id).where(Earthquake.id.in_(ids_to_check))
+    
+    result = db.execute(stmt).scalars().all()
+    
     return set(result)
 
 def insert_new_record(db: Session, record_data: dict):
@@ -40,6 +58,19 @@ def insert_new_record(db: Session, record_data: dict):
     new_record = Earthquake(**record_data)
     
     db.add(new_record)
+
+def insert_new_records_bulk(db: Session, records: list[dict]):
+    """
+    Insert new records on table in bulk
+
+    Insert into earthquake table a list of new records, with data from a dictionary
+    
+    :param db: Session for the database connection.
+    :type db: Session
+    :param records: List of Dictionaries with the record data.
+    :type records: list[dict]
+    """
+    db.execute(Earthquake.__table__.insert(), records)
 
 
 def get_base_select_statement():
