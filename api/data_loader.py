@@ -1,7 +1,5 @@
 import requests
-from DB import queries
-from DB import Earthquake
-from DB import get_db
+from DB import queries, Earthquake, get_db
 
 def fetch_earthquake_data():
     response = requests.get("https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_day.geojson")
@@ -31,5 +29,5 @@ def fetch_earthquake_data():
                 "depth" : coords[2]
             }
 
-            #queries.add_new_record(db, earthquake_data)
-            break
+            if id not in existing_ids:
+                queries.add_new_record(db, earthquake_data)

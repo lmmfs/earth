@@ -7,7 +7,8 @@ class UnixTimestampMs(TypeDecorator):
     Stores data as TIMESTAMP WITH TIME ZONE in the DB (impl=DateTime),
     converts millisecond Unix timestamps from Python to datetime objects.
     """
-    impl = DateTime(timezone=True)  # The SQL type the database sees
+    impl = DateTime(timezone=True) 
+    cache_ok = True
 
     def process_bind_param(self, value: Optional[int], dialect) -> Optional[datetime]:
         if value is not None:

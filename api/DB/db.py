@@ -11,7 +11,7 @@ Base = declarative_base()
 
 @contextmanager
 def get_db():
-    """Provides a transactional scope around a series of operations."""
+    """Provides a transactional scope for db operations"""
     db = SessionLocal()
     try:
         yield db
