@@ -138,7 +138,7 @@ The code was done focused on having only one table on the databse, but this beha
 
 ## Roadmap
 
-- compose set api url
+- double check documentaion
 
 - Add unit-tests
 
