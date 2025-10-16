@@ -135,3 +135,12 @@ def get_db():
 ```
 With this I can do basic error handling when quering the database, and given that use `with get_db() as db:`, it will close the connenction in the of the code block.  
 The code was done focused on having only one table on the databse, but this behaviour can be imporved to deal with different tables on the database
+
+## Roadmap
+
+- compose set api url
+
+- Add unit-tests
+
+- fix container creates folders as root
+
