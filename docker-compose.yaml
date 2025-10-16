@@ -23,6 +23,8 @@ services:
     container_name: earthquake_api
     environment:
       DATABASE_URL: postgres://user:password@db:5432/earthquakes
+    volumes:
+      - ./logs:/app/logs
     depends_on:
       db:
         condition: service_healthy
