@@ -1,22 +1,38 @@
 from contextlib import asynccontextmanager
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from datetime import datetime
+from typing import Optional
 from fastapi import FastAPI, HTTPException
+from constants import MAX_MAGNITUDE, MIN_MAGNITUDE, REFRESH_DATASET_INTERVAL_SECONDS
 from DB import engine, Base, model
 from data_requester import retrieve_recent_earthquakes, retrieve_specific_earthquake
-from logger import get_logger
+from data_loader import fetch_earthquake_data_opt
+from logger import get_logger, setup_logging
 
 app = FastAPI()
+setup_logging()
 app_logger = get_logger("API_MAIN") 
+scheduler = AsyncIOScheduler()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Startup
     app_logger.info("Logger initialized")
+    # Create database
     Base.metadata.create_all(bind=engine)
-    # Request USGS data on app startup
-    from data_loader import fetch_earthquake_data
-    fetch_earthquake_data()
+    # Request USGS data on 10 second interval
+    scheduler.add_job(
+        func=fetch_earthquake_data_opt, 
+        trigger='interval', 
+        seconds=REFRESH_DATASET_INTERVAL_SECONDS, 
+        id='earthquake_fetcher',
+        replace_existing=True
+    )
+    scheduler.start()
     yield
     # Shutdown
+    app_logger.info("App shutting down")
+    scheduler.shutdown()
     
 
 app = FastAPI(lifespan=lifespan)
@@ -28,8 +44,27 @@ def read_root():
 
 
 @app.get("/earthquakes")
-def get_recent_earthquakes():
-    return retrieve_recent_earthquakes()
+def get_recent_earthquakes(
+    offset: int = 0, 
+    limit: int = 10, 
+    min_magnitude: float = MIN_MAGNITUDE,
+    max_magnitude: float = MAX_MAGNITUDE,
+    after: Optional[datetime] = None,
+    before: Optional[datetime] = None,
+    ):
+    # Early check for query parameters
+    if max_magnitude < min_magnitude:
+        raise HTTPException(status_code=400, detail="invalid magnitudes")
+
+    if after and before and before < after:
+        raise HTTPException(status_code=400, detail="invalid date interval")
+    
+    records, found = retrieve_recent_earthquakes(offset, limit, min_magnitude, max_magnitude, after, before)
+    
+    if not found:
+        raise HTTPException(status_code=404, detail="records not found")
+
+    return records
 
 
 @app.get("/earthquakes/{earthquake_id}")
