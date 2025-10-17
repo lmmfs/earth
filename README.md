@@ -3,14 +3,6 @@
 
 A Rest API developed in python using fast api to collect data from USGS services
 
-## Install dependencies
-
-Run the setup script to install locally the python dependencies
-
-```bash
-python3 setup.py
-```
-
 ## Deployment
 
 To deploy this project
@@ -22,18 +14,34 @@ clone the github repository
 start the services
 
 ```bash
+  cd earth
   docker compose up
 ```
 
+with the default configuration the  API will be available at http://0.0.0.0:8000  
+to change this configuration is need to change the docker-compose.yaml 
+
+## Local Development Setup
+
+If you prefer to run the API locally (outside of Docker), use the setup script to install all Python dependencies in your environment.
+### Install dependencies
+
+Run the setup script to install locally the python dependencies the root of the project.  
+It will install the dependencies for used in the api module and for tests
+
+```bash
+  cd earth
+  python3 setup.py
+```
 
 ## Running Tests
 
-To run tests, run the pytest command
+To run tests, run the pytest command on the root of the project
 
 ```bash
+  cd earth
   pytest
 ```
-
 
 ## API Reference
 
@@ -56,6 +64,8 @@ To run tests, run the pytest command
 | :---------------- | :-------------------- |
 |200 OK	            | Successfully returned the most recent earthquake records.|
 |404 Not Found	    | No earthquake record exists with the provided ID.|
+|400 Bad Request	  | If the magnitude interval is invalid i.e max_magnitude > min_magnitude.|
+|400 Bad Request	  | If the date interval is invalid i.e before < after.|
 
 
 #### Get earthquake record
@@ -75,21 +85,6 @@ To run tests, run the pytest command
 
 
 ## Brief notes on design decisions
-
-### Database schema
-For the database schema I add these columns
-
-- id - VARCHAR(50) primary_key
-- magnitude - FLOAT
-- time - DATETIME
-- location - VARCHAR(255)
-- latitude - FLOAT
-- longitude - FLOAT
-- depth - FLOAT
-
-I decided to use the USGS id as the primary key for my DB, since in the records it was already a unique value, so I don't to create my own unique ids.  
-The limitation might be since if is necessary to add a source of earthquake data it is needed to change how the ids are stored maybe a combination of source + the unique of the record within that source  
-
 
 ### Project structure
 ```text
@@ -130,14 +125,26 @@ The limitation might be since if is necessary to add a source of earthquake data
     └── test_api.py
 ```
 
-The root of the project is  docker-compose.yaml to start the db service and api service. The api folder will be for the api code and data folder will be a volume for the db container  
-In api folder I decided to create DB module to store all methods that interact with the database. I though it made the code more organized.  
-On thing that I decided was to have the methods tha call the db queries on data_loader.py and data_requester.py, making that on main.py you only have the API routes. The though behind this was to make the main only be responsible with the results and http responses. 
+The root of the project is docker-compose.yaml to start the db service and api service. The api folder will be for the api code and data folder will be a volume for the db container.  
+On the api module the design was focused on separated concerns: main.py handles API routing and HTTP responses; data_loader.py and data_requester.py handle data flow; and the dedicated DB module encapsulates all database interaction logic.  
+My main was simple organization of the code
 
-### Database configuration values
+### Database schema
+For the database schema I add these columns
+
+- id - VARCHAR(50) primary_key
+- magnitude - FLOAT
+- time - DATETIME
+- location - VARCHAR(255)
+- latitude - FLOAT
+- longitude - FLOAT
+- depth - FLOAT
+
+I decided to use the USGS id as the primary key for my DB, since in the records it was already a unique value, so I didn't create my own unique ids. 
+This approach will require changing the ID structure (making a composite key combining source + unique_record_id) if its necessary to add data from multiple earthquake sources.
 
 ### Project notes
-#### database creation
+#### Database creation
 I decided to make the api create the database on api startup, like this
 ```code
 async def lifespan(app: FastAPI):
@@ -145,7 +152,11 @@ async def lifespan(app: FastAPI):
     Base.metadata.create_all(bind=engine) 
 ```
 I decided on this given the scope of this project on having only one table on the database, the objective was to make easy as possible to setup, without touching directly on the database container.   
-The problem with this approach is if there are changes to model, like adding a new column to the table. The `create_all()` method will not pick up on the changes and we will need a database migration tool.
+The limitation is that approach does not support schema evolution. Any future model changes (e.g., adding a new column) are not caught by `create_all()` method. It would require integrating a database migration tool (like Alembic).
+
+#### Database configuration values
+Giving the size of the project scope, the configuration for the database is defined on the docker-compose.yaml.  
+In the future some of these value should be moved to a Docker secret for better security.
 
 #### get_db
 During the development, it was needed to add `asynccontextmanager` because of fastapi lifespan, with that I learn about python context manager and found that it might be useful to use something similar when dealing with database requests.  
