@@ -3,7 +3,7 @@
 
 A Rest API developed in python using fast api to collect data from USGS services
 
-## Install dependecies
+## Install dependencies
 
 Run the setup script to install locally the python dependencies
 
@@ -48,7 +48,7 @@ To run tests, run the pytest command
 | `offset` | `int` | `0` | The number of records to skip (for pagination). |
 | `limit` | `int` | `10` | The maximum number of records to return per page. |
 | `min_magnitude` | `float` | `0.0` | Minimum magnitude (inclusive, e.g., magnitude >= min_magnitude). |
-| `max_magnitude` | `float` | `20.0` | Maximum magnitude (inclusive, e.g., magnitude <= max_magnitud). |
+| `max_magnitude` | `float` | `20.0` | Maximum magnitude (inclusive, e.g., magnitude <= max_magnitude). |
 | `after` | `datetime` | (None) | Filter for records occurring on or after this date/time (ISO 8601 format). |
 | `before` | `datetime` | (None) | Filter for records occurring on or before this date/time (ISO 8601 format). |
 
@@ -77,7 +77,7 @@ To run tests, run the pytest command
 ## Brief notes on design decisions
 
 ### Database schema
-For the database schema I add these colums
+For the database schema I add these columns
 
 - id - VARCHAR(50) primary_key
 - magnitude - FLOAT
@@ -87,7 +87,7 @@ For the database schema I add these colums
 - longitude - FLOAT
 - depth - FLOAT
 
-I decided to use the UGSS id as the primary key for my DB, since in the records it was already a unique value, so I don't to create my own unique ids.  
+I decided to use the USGS id as the primary key for my DB, since in the records it was already a unique value, so I don't to create my own unique ids.  
 The limitation might be since if is necessary to add a source of earthquake data it is needed to change how the ids are stored maybe a combination of source + the unique of the record within that source  
 
 
@@ -132,7 +132,7 @@ The limitation might be since if is necessary to add a source of earthquake data
 
 The root of the project is  docker-compose.yaml to start the db service and api service. The api folder will be for the api code and data folder will be a volume for the db container  
 In api folder I decided to create DB module to store all methods that interact with the database. I though it made the code more organized.  
-On thing that I decided was to have the metdhods tha call the db queries on data_loader.py and data_requester.py, making that on main.py you only have the API routes. The though bewind this was to make the main only be responsable with the results and http responses. 
+On thing that I decided was to have the methods tha call the db queries on data_loader.py and data_requester.py, making that on main.py you only have the API routes. The though behind this was to make the main only be responsible with the results and http responses. 
 
 ### Database configuration values
 
@@ -144,11 +144,11 @@ async def lifespan(app: FastAPI):
     # Startup
     Base.metadata.create_all(bind=engine) 
 ```
-I decided on this given the scope of this project on having only one table on the database, the objective was to make easy as possible to setup, without touching directlly on the database container.   
+I decided on this given the scope of this project on having only one table on the database, the objective was to make easy as possible to setup, without touching directly on the database container.   
 The problem with this approach is if there are changes to model, like adding a new column to the table. The `create_all()` method will not pick up on the changes and we will need a database migration tool.
 
 #### get_db
-During the developement, it was needed to add `asynccontextmanager` because of fastapi lifespan, with that I learn about python context manager and found that it might be useful to use something similar when dealing with database requests.  
+During the development, it was needed to add `asynccontextmanager` because of fastapi lifespan, with that I learn about python context manager and found that it might be useful to use something similar when dealing with database requests.  
 So I added the method `get_db()` on the DB model
 ```code
 @contextmanager
@@ -164,14 +164,12 @@ def get_db():
     finally:
         db.close()
 ```
-With this I can do basic error handling when quering the database, and given that use `with get_db() as db:`, it will close the connenction in the of the code block.  
-The code was done focused on having only one table on the databse, but this behaviour can be imporved to deal with different tables on the database
+With this I can do basic error handling when querying the database, and given that use `with get_db() as db:`, it will close the connection in the of the code block.  
+The code was done focused on having only one table on the database, but this behavior can be improved to deal with different tables on the database
 
 ## Roadmap
 
-- double check documentaion
-
-- Add unit-tests
+- double check documentation
 
 - fix container creates folders as root
 

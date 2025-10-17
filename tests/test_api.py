@@ -23,6 +23,9 @@ MOCK_EARTHQUAKE = (
     )
 
 def test_get_earthquakes_success(mocker):
+    '''
+    Test to validate a successful retrieval of data from database
+    '''
     mocker.patch(
         "api.main.retrieve_recent_earthquakes", 
         return_value=MOCK_EARTHQUAKES
@@ -36,6 +39,9 @@ def test_get_earthquakes_success(mocker):
 
 
 def test_get_earthquakes_not_found(mocker):
+    '''
+    Test to validate a api returns NOT FOUND when no data is retrieved from database
+    '''
     mocker.patch(
         "api.main.retrieve_recent_earthquakes", 
         return_value=(None, False)
@@ -45,17 +51,28 @@ def test_get_earthquakes_not_found(mocker):
     assert response.status_code == HTTPStatus.NOT_FOUND
 
 
-def test_get_earthquakes_invalid_magnitute_interval():
+def test_get_earthquakes_invalid_magnitude_interval():
+    '''
+    Test to validate a api returns BAD REQUEST when the magnitude is invalid
+    max_magnitude < min_magnitude
+    '''
     response = client.get("/earthquakes?min_magnitude=10&max_magnitude=2")
     assert response.status_code == HTTPStatus.BAD_REQUEST
 
 
 def test_get_earthquakes_invalid_date_interval():
+    '''
+    Test to validate a api returns BAD REQUEST when the time interval is invalid
+    before < after
+    '''
     response = client.get("/earthquakes?after=2025-01-01T00:00:00Z&before=2024-01-01T00:00:00Z")
     assert response.status_code == HTTPStatus.BAD_REQUEST
 
 
 def test_get_earthquakes_by_id_success(mocker):
+    '''
+    Test to validate a successful retrieval giving and earthquake id of data from database
+    '''
     mocker.patch(
         "api.main.retrieve_specific_earthquake", 
         return_value=MOCK_EARTHQUAKE
@@ -69,6 +86,10 @@ def test_get_earthquakes_by_id_success(mocker):
 
 
 def test_get_earthquakes_by_id_not_found(mocker):
+    '''
+    Test to validate api returns NOT FOUND when
+    a earthquake id doesn't find a match in the data from database
+    '''
     mocker.patch(
         "api.main.retrieve_specific_earthquake", 
         return_value=(None, False)
@@ -84,6 +105,9 @@ def test_get_earthquakes_by_id_not_found(mocker):
     "/earthquakes/I D"
 ])
 def test_get_earthquakes_by_id_missing_id(invalid_path):
-    print(invalid_path)
+    '''
+    Test to validate api returns BAD REQUEST when
+    the earthquake request is invalid
+    '''
     response = client.get(invalid_path)
     assert response.status_code == HTTPStatus.NOT_FOUND
