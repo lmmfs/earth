@@ -1,7 +1,7 @@
 from datetime import datetime
-from zoneinfo import ZoneInfo
-from http import HTTPStatus
 from fastapi.testclient import TestClient
+from http import HTTPStatus
+from zoneinfo import ZoneInfo
 from .context import api
 import pytest
 

@@ -1,9 +1,10 @@
 from contextlib import asynccontextmanager
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from datetime import datetime
-from typing import Optional
 from fastapi import FastAPI, HTTPException
 from http import HTTPStatus
+from typing import Optional
+
 from api.DB import engine, Base, model
 from api.Utils.constants import MAX_MAGNITUDE, MIN_MAGNITUDE, REFRESH_DATASET_INTERVAL_SECONDS
 from api.Utils.logger import get_logger, setup_logging

@@ -1,5 +1,6 @@
 from datetime import datetime
 from typing import List, Optional
+
 from api.DB import queries, EarthquakeResponse, get_db, Earthquake
 from api.Utils.constants import MAX_MAGNITUDE, MIN_MAGNITUDE
 from api.Utils.logger import get_logger

@@ -1,6 +1,6 @@
-from typing import Optional
-from sqlalchemy.types import TypeDecorator, DateTime
 from datetime import datetime, timezone
+from sqlalchemy.types import TypeDecorator, DateTime
+from typing import Optional
 
 class UnixTimestampMs(TypeDecorator):
     """

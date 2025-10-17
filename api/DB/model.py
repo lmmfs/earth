@@ -1,6 +1,6 @@
 from sqlalchemy import Column, DateTime, String, Float
-from .db import Base
 
+from .db import Base
 from .decoders import UnixTimestampMs 
 
 class Earthquake(Base):
