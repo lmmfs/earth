@@ -1,6 +1,6 @@
 import logging
 
-from constants import LOG_FILE, LOG_FORMAT, LOG_LEVEL
+from api.Utils.constants import LOG_FILE, LOG_FORMAT, LOG_LEVEL
 
 def setup_logging():
     """

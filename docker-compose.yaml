@@ -19,7 +19,7 @@ services:
       start_period: 10s
 
   api:
-    build: ./api
+    build: .
     container_name: earthquake_api
     environment:
       DATABASE_URL: postgres://user:password@db:5432/earthquakes

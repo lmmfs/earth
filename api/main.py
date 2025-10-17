@@ -3,11 +3,11 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from datetime import datetime
 from typing import Optional
 from fastapi import FastAPI, HTTPException
-from constants import MAX_MAGNITUDE, MIN_MAGNITUDE, REFRESH_DATASET_INTERVAL_SECONDS
-from DB import engine, Base, model
-from data_requester import retrieve_recent_earthquakes, retrieve_specific_earthquake
-from data_loader import fetch_earthquake_data_opt
-from logger import get_logger, setup_logging
+from api.DB import engine, Base, model
+from api.Utils.constants import MAX_MAGNITUDE, MIN_MAGNITUDE, REFRESH_DATASET_INTERVAL_SECONDS
+from api.Utils.logger import get_logger, setup_logging
+from .data_loader import fetch_earthquake_data_opt
+from .data_requester import retrieve_recent_earthquakes, retrieve_specific_earthquake
 
 app = FastAPI()
 setup_logging()

@@ -3,7 +3,7 @@ from sqlalchemy import create_engine, select
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
-from logger import get_logger
+from api.Utils.logger import get_logger
 
 DATABASE_URL = "postgresql://user:password@db:5432/earthquakes"
 
