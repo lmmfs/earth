@@ -5,6 +5,11 @@ A Rest API developed in python using fast api to collect data from USGS services
 
 ## Install dependecies
 
+Run the setup script to install locally the python dependencies
+
+```bash
+python3 setup.py
+```
 
 ## Deployment
 
@@ -18,6 +23,15 @@ start the services
 
 ```bash
   docker compose up
+```
+
+
+## Running Tests
+
+To run tests, run the pytest command
+
+```bash
+  pytest
 ```
 
 
@@ -97,20 +111,22 @@ The limitation might be since if is necessary to add a source of earthquake data
 │       ├── constants.py
 │       ├── __init__.py
 │       └── logger.py
-├── data  [error opening dir]
+├── data 
 ├── .devcontainer
 │   ├── devcontainer.json
 │   ├── docker-compose.dev.yml
 │   └── Dockerfile.dev
 ├── docker-compose.yaml
 ├── Dockerfile
-├── .gitignore
 ├── logs
 │   └── app.log
+├── pytest.ini
 ├── README.md
 ├── requirements-dev.txt
 ├── templatedata.json
 └── tests
+    ├── context.py
+    ├── __init__.py
     └── test_api.py
 ```
 
