@@ -1,8 +1,8 @@
-import requests
-from DB import queries, get_db
 import copy
+import requests
 
-from logger import get_logger 
+from api.DB import queries, get_db
+from api.Utils.logger import get_logger 
 
 logger = get_logger(__name__)
 

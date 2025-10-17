@@ -1,13 +1,15 @@
 from contextlib import asynccontextmanager
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from datetime import datetime
-from typing import Optional
 from fastapi import FastAPI, HTTPException
-from constants import MAX_MAGNITUDE, MIN_MAGNITUDE, REFRESH_DATASET_INTERVAL_SECONDS
-from DB import engine, Base, model
-from data_requester import retrieve_recent_earthquakes, retrieve_specific_earthquake
-from data_loader import fetch_earthquake_data_opt
-from logger import get_logger, setup_logging
+from http import HTTPStatus
+from typing import Optional
+
+from api.DB import engine, Base, model
+from api.Utils.constants import MAX_MAGNITUDE, MIN_MAGNITUDE, REFRESH_DATASET_INTERVAL_SECONDS
+from api.Utils.logger import get_logger, setup_logging
+from .data_loader import fetch_earthquake_data_opt
+from .data_requester import retrieve_recent_earthquakes, retrieve_specific_earthquake
 
 app = FastAPI()
 setup_logging()
@@ -54,15 +56,15 @@ def get_recent_earthquakes(
     ):
     # Early check for query parameters
     if max_magnitude < min_magnitude:
-        raise HTTPException(status_code=400, detail="invalid magnitudes")
+        raise HTTPException(status_code=HTTPStatus.BAD_REQUEST, detail="invalid magnitudes")
 
     if after and before and before < after:
-        raise HTTPException(status_code=400, detail="invalid date interval")
+        raise HTTPException(status_code=HTTPStatus.BAD_REQUEST, detail="invalid date interval")
     
     records, found = retrieve_recent_earthquakes(offset, limit, min_magnitude, max_magnitude, after, before)
     
     if not found:
-        raise HTTPException(status_code=404, detail="records not found")
+        raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail="records not found")
 
     return records
 
@@ -70,12 +72,12 @@ def get_recent_earthquakes(
 @app.get("/earthquakes/{earthquake_id}")
 def get_specific_earthquake(earthquake_id: str):
     if not earthquake_id:
-        app_logger.warning("empty id requested")
-        raise HTTPException(status_code=404, detail="record not found")
+        app_logger.warning("invalid id requested")
+        raise HTTPException(status_code=HTTPStatus.BAD_REQUEST, detail="record not found")
     
     record, found = retrieve_specific_earthquake(earthquake_id)
 
     if not found:
-        raise HTTPException(status_code=404, detail="record not found")
+        raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail="record not found")
 
     return record

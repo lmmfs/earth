@@ -1,0 +1,10 @@
+# Requirements for devoloping/testing
+
+# Testing framework
+pytest
+
+# Mocking Library
+pytest-mock
+
+# HTTP Client for TestClient
+httpx

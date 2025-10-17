@@ -3,8 +3,13 @@
 
 A Rest API developed in python using fast api to collect data from USGS services
 
+## Install dependecies
 
+Run the setup script to install locally the python dependencies
 
+```bash
+python3 setup.py
+```
 
 ## Deployment
 
@@ -18,6 +23,15 @@ start the services
 
 ```bash
   docker compose up
+```
+
+
+## Running Tests
+
+To run tests, run the pytest command
+
+```bash
+  pytest
 ```
 
 
@@ -90,13 +104,30 @@ The limitation might be since if is necessary to add a source of earthquake data
 │   │   ├── model.py
 │   │   ├── queries.py
 │   │   └── schemas.py
-│   ├── Dockerfile
-│   ├── logger.py
+│   ├── __init__.py
 │   ├── main.py
-│   └── requirements.txt
-├── data
+│   ├── requirements.txt
+│   └── Utils
+│       ├── constants.py
+│       ├── __init__.py
+│       └── logger.py
+├── data 
+├── .devcontainer
+│   ├── devcontainer.json
+│   ├── docker-compose.dev.yml
+│   └── Dockerfile.dev
 ├── docker-compose.yaml
-└── README.md
+├── Dockerfile
+├── logs
+│   └── app.log
+├── pytest.ini
+├── README.md
+├── requirements-dev.txt
+├── templatedata.json
+└── tests
+    ├── context.py
+    ├── __init__.py
+    └── test_api.py
 ```
 
 The root of the project is  docker-compose.yaml to start the db service and api service. The api folder will be for the api code and data folder will be a volume for the db container  

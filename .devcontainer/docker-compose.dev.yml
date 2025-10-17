@@ -8,4 +8,4 @@ services:
       dockerfile: .devcontainer/Dockerfile.dev 
     volumes:
       # Map the local code to the container's app directory
-      - ./api:/app 
+      - .:/app 

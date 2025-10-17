@@ -1,8 +1,9 @@
 from datetime import datetime
 from typing import List, Optional
-from DB import queries, EarthquakeResponse, get_db, Earthquake
-from constants import MAX_MAGNITUDE, MIN_MAGNITUDE
-from logger import get_logger
+
+from api.DB import queries, EarthquakeResponse, get_db, Earthquake
+from api.Utils.constants import MAX_MAGNITUDE, MIN_MAGNITUDE
+from api.Utils.logger import get_logger
 
 logger = get_logger(__name__) 
 

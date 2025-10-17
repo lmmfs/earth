@@ -1,8 +1,8 @@
-from typing import List, Tuple
 from sqlalchemy import Select, select
 from sqlalchemy.orm import Session
+from typing import List, Tuple
 
-from logger import get_logger
+from api.Utils.logger import get_logger
 from .db import engine
 from .model import Earthquake
 from .schemas import EarthquakeResponse
