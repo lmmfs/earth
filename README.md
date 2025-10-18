@@ -114,6 +114,7 @@ To run tests, run the pytest command on the root of the project
 ├── docker-compose.yaml
 ├── Dockerfile
 ├── logs
+|   ├── placeholder.txt
 │   └── app.log
 ├── pytest.ini
 ├── README.md
@@ -129,6 +130,9 @@ The root of the project is docker-compose.yaml to start the db service and api s
 On the api module the design was focused on separated concerns: main.py handles API routing and HTTP responses; data_loader.py and data_requester.py handle data flow; and the dedicated DB module encapsulates all database interaction logic.  
 My main was simple organization of the code
 
+### Dev container
+For development, the project relies on the VS Code Dev Containers extension and the files defined in the .devcontainer folder. This setup ensures a consistent, isolated development environment that mirrors the final environment, providing both the database and the API code running inside containers.
+
 ### Database schema
 For the database schema I add these columns
 
@@ -143,8 +147,28 @@ For the database schema I add these columns
 I decided to use the USGS id as the primary key for my DB, since in the records it was already a unique value, so I didn't create my own unique ids. 
 This approach will require changing the ID structure (making a composite key combining source + unique_record_id) if its necessary to add data from multiple earthquake sources.
 
-### Project notes
-#### Database creation
+### API design
+When design the API, my assumption was that the service would request data to USGS and stored in the database, then on each request is mapped to a select statement on the database.  
+For the earthquakes/ get endpoint, I assumed that the most recent records is referring to the earth record timestamp so the select is ordered by this datetime.  
+This creates a limitation when I added a scheduler to call the method that collects data every 10 seconds. The earthquakes/ get endpoint became not idempotent because the values for the most recent earthquakes might change. The query parameters for filtering (specially the date intervals) might reduce the variance of the results
+
+### Query filtering
+
+One of the extra objectives was to add filtering to the get endpoint based on magnitude and time.  
+To implement tis filtering I had 2 ideas. 
+
+- Add a value, and a variable for the condition (e.g. earthquakes?magnitude=5.0&value=greater)
+
+- Add bound limits to the maximum and minimum that value can have (e.g. earthquakes?max_magnitude=5.0&min_magnitude=1.0)
+
+I decided on going with the second option, is simpler for a user to set the values that he wants, is simpler on implementation since is not need to check the different values for the relation like greater or lesser. This way is also simpler to map to the select query.  
+Also add a basic condition to validate if the interval is valid (e.g. max > min), and return BAD REQUEST is the condition is not satisfied.
+
+### logs placeholder
+during the development, an issue that I encountered was the creation of the log folder, when I added the log folder as a docker compose volume, if this folder didn't exist it was created by the user root, this resulted on permission errors when running the app.  
+To solve this I decided on locally create the log folder, and put a placeholder file in it so it would be keep on the git repo. 
+
+### Database creation
 I decided to make the api create the database on api startup, like this
 ```code
 async def lifespan(app: FastAPI):
@@ -154,11 +178,11 @@ async def lifespan(app: FastAPI):
 I decided on this given the scope of this project on having only one table on the database, the objective was to make easy as possible to setup, without touching directly on the database container.   
 The limitation is that approach does not support schema evolution. Any future model changes (e.g., adding a new column) are not caught by `create_all()` method. It would require integrating a database migration tool (like Alembic).
 
-#### Database configuration values
+### Database configuration values
 Giving the size of the project scope, the configuration for the database is defined on the docker-compose.yaml.  
 In the future some of these value should be moved to a Docker secret for better security.
 
-#### get_db
+### get_db function
 During the development, it was needed to add `asynccontextmanager` because of fastapi lifespan, with that I learn about python context manager and found that it might be useful to use something similar when dealing with database requests.  
 So I added the method `get_db()` on the DB model
 ```code
@@ -177,10 +201,4 @@ def get_db():
 ```
 With this I can do basic error handling when querying the database, and given that use `with get_db() as db:`, it will close the connection in the of the code block.  
 The code was done focused on having only one table on the database, but this behavior can be improved to deal with different tables on the database
-
-## Roadmap
-
-- double check documentation
-
-- fix container creates folders as root
 
