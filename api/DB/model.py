@@ -9,6 +9,7 @@ class Earthquake(Base):
     # Use the id from USGS
     id = Column(String(50), primary_key=True)
     magnitude = Column(Float)
+    # Parser to datetime from unix timestamp
     time = Column(UnixTimestampMs)
     location = Column(String(255))
     latitude = Column(Float)
